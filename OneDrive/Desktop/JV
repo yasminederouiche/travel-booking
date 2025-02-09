@@ -1,0 +1,94 @@
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("form");
+
+    form.addEventListener("submit", function (event) {
+        event.preventDefault(); // Empêcher l'envoi du formulaire si la validation échoue
+
+        let isValid = true;
+
+        // Supprimer tous les anciens messages d'erreur
+        document.querySelectorAll(".error-message").forEach(el => el.remove());
+
+        // Récupération des champs du formulaire
+        const title = document.getElementById("title");
+        const destination = document.getElementById("destination");
+        const startDate = document.getElementById("startDate");
+        const endDate = document.getElementById("endDate");
+        const price = document.getElementById("price");
+
+        // Fonction pour afficher un message d'erreur sous le champ
+        function showError(input, message) {
+            input.style.border = "2px solid red";
+            let error = document.createElement("p");
+            error.className = "error-message";
+            error.style.color = "red";
+            error.style.fontSize = "14px";
+            error.textContent = message;
+            input.parentNode.appendChild(error);
+        }
+
+        // Fonction pour valider un champ
+        function showSuccess(input) {
+            input.style.border = "2px solid green";
+        }
+
+        // Validation du titre
+        if (title.value.trim().length < 3) {
+            showError(title, "The title must contain at least 3 characters.");
+            isValid = false;
+        } else {
+            showSuccess(title);
+        }
+
+        // Validation de la destination (lettres et espaces uniquement)
+        if (!/^[A-Za-z ]{3,}$/.test(destination.value.trim())) {
+            showError(destination, "The destination must contain only letters and spaces, and at least 3 characters.");
+            isValid = false;
+        } else {
+            showSuccess(destination);
+        }
+
+        // Validation de la date de départ
+        if (!startDate.value) {
+            showError(startDate, "Please select a valid departure date.");
+            isValid = false;
+        } else {
+            showSuccess(startDate);
+        }
+
+        // Validation de la date de retour (doit être après la date de départ)
+        if (!endDate.value) {
+            showError(endDate, "Please select a valid return date.");
+            isValid = false;
+        } else if (new Date(endDate.value) <= new Date(startDate.value)) {
+            showError(endDate, "The return date must be later than the departure date.");
+            isValid = false;
+        } else {
+            showSuccess(endDate);
+        }
+
+        // Validation du prix (doit être un nombre positif)
+        const priceValue = parseFloat(price.value.trim());
+        if (isNaN(priceValue) || priceValue <= 0) {
+            showError(price, "The price must be a positive number.");
+            isValid = false;
+        } else {
+            showSuccess(price);
+        }
+
+        // Si tout est valide, afficher un message de succès et soumettre le formulaire
+        if (isValid) {
+            let successMessage = document.createElement("p");
+            successMessage.className = "success-message";
+            successMessage.style.color = "green";
+            successMessage.style.fontSize = "16px";
+            successMessage.style.fontWeight = "bold";
+            successMessage.textContent = "Offer added successfully!";
+            form.appendChild(successMessage);
+
+            setTimeout(() => {
+                form.submit(); // Envoie du formulaire après validation
+            }, 1500);
+        }
+    });
+});
